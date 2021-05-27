@@ -40,33 +40,14 @@ private:
 	vectorD output;
 	parameter grf;// grf
     parameter gamma;// adaptive feedback gain
+    parameter mg;//robot weight
 };
 
-//------------ACI class------------//
-class ACI{
-public:
-	ACI(unsigned int ID,unsigned int nCPGs);
-	void setInput(matrixD signals);
-	void step();
-	parameter getOutput(unsigned int index)const;
-	void initDelta(parameter constant=0.0);
-	void initK(parameter constant);
-	void setK();
-	void setDelta(CPGSTYPE CPGSType, Matrix cmatrix);
-private:
-	unsigned int ID;
-	unsigned int nCPGs;
-	vectorD output;
-	matrixD cCPGat;
-	matrixD delta;
-	matrixD K;
-	parameter C;
-};
 //-------------PhaseReset class---------//
 class PhaseReset{
 public:
 	PhaseReset();
-	void setInput(vectorD a_t,parameter grf);
+	void setInput(vectorD a_t,parameter grf, parameter threshold);
 	void step();
 	parameter getOutput(unsigned int index)const;
 private:
@@ -75,7 +56,9 @@ private:
 	vectorD reset;
 	parameter grf;
 	parameter grf_old;
+	parameter threshold;
 	parameter Diracs;
+    parameter mg;// robot weight
 };
 //-----------PhaseInhibition class-----//
 class PhaseInhibition{
@@ -105,6 +88,31 @@ class Vestibular{
         vector<parameter> ves;
         vectorD a_t;
 };
+
+
+//------------ACI class------------//
+class ACI{
+public:
+	ACI(unsigned int ID,unsigned int nCPGs);
+	void setInput(matrixD signals);
+	void step();
+	parameter getOutput(unsigned int index)const;
+	void initDelta(parameter constant=0.0);
+	void initK(parameter constant);
+	void setK();
+	void setDelta(CPGSTYPE CPGSType, Matrix cmatrix);
+private:
+	unsigned int ID;
+	unsigned int nCPGs;
+	vectorD output;
+	matrixD cCPGat;
+	matrixD delta;
+	matrixD K;
+	parameter C;
+};
+
+
+
 //-------------synaptic plasticity CPG class---------------//
 class SPCPG :public ANN
 {
@@ -138,7 +146,7 @@ public:
 		parameter getSFOutput(unsigned int index)const;
 	
 		void setMi(parameter mi);
-        void setInput(parameter grf, parameter np_grf, vector<parameter> ori, parameter gain, matrixD signals, CPGSTYPE CPGType, Matrix cmatrix);
+        void setInput(parameter grf, parameter np_grf, vector<parameter> ori, parameter gain, parameter threshold, matrixD signals, CPGSTYPE CPGType, Matrix cmatrix);
 private:
     matrixD aci_signals;
     CPGSTYPE aci_CPGType;
@@ -150,7 +158,8 @@ private:
     vector<parameter> ves_ori;
     parameter ves_grf;
 
-    parameter prs_np_grf;
+    parameter prs_grf;
+    parameter prs_threshold;
 
     parameter pib_grf;
 };

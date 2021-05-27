@@ -1,0 +1,8 @@
+prefix=/home/suntao/workspace/stbot/pmpr/projects/genesis/catkin_ws/devel
+
+Name: stbot_pmpr
+Description: Description of stbot_pmpr
+Version: 0.0.0
+Cflags: -I/home/suntao/workspace/stbot/pmpr/projects/genesis/catkin_ws/src/stbot_pmpr/include
+Libs: -L${prefix}/lib -lstbot_pmpr
+Requires: roscpp std_msgs sensor_msgs control_msgs

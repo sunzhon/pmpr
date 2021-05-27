@@ -18,7 +18,7 @@ AdaptiveFeedbackGain::AdaptiveFeedbackGain(unsigned int id) {
 
 	// TODO Auto-generated constructor stub
     this->ID = id;
-	// force fwardmodel
+	// force fwardmodel to get expected GRFs using efference copy (motor commands)
 	FFM =new ForceForwardmodel(0.95);
     //dual-rate learning
     DL = new DLearn();
@@ -36,7 +36,7 @@ void AdaptiveFeedbackGain::setInput(float grf, float joint_motor){
     this->grf=grf;
     }
 void AdaptiveFeedbackGain::step(){
-	//-1) force forward model
+	//1) force forward model
 	FFM->step();
     expectedValue = FFM->getOutput();
     actualValue = grf;

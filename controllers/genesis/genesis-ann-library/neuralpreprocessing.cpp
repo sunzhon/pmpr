@@ -8,8 +8,9 @@ Description: It is a ann with hypersis properties
 
 #include "neuralpreprocessing.h"
 
-NP::NP(std::string _transfer,bool learning):count(0),nu(0.01),input(0.0),target(0.0)
+NP::NP(float scale, std::string _transfer,bool learning):count(0),nu(0.01),input(0.0),target(0.0)
 {
+    this->scale=scale;// the amplitude of the output
 	transfer = _transfer;
 	learning_state=learning;
 	setNeuronNumber(1);
@@ -82,7 +83,7 @@ void NP::setUp(double _Wi,double _Wr,double _Bias){
 }
 double NP::getOutput()
 {
-   return ANN::getOutput(0);
+   return scale*ANN::getOutput(0);
 }
 
 double NP::getWr(){

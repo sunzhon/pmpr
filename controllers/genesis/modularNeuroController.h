@@ -10,17 +10,14 @@
 #include <iostream>
 #include <stdio.h>
 #include <time.h>
+//#include "utils/sim_robots/stbot/stdogbot/dogbotsensormotordefinition.h"
 #include "learning-tool/lowPassfilter.h"
 #include "learning-tool/movingAverage.h"
+#include "learning-tool/autoNeuralConnection.h"
 #include "genesis-ann-library/manipulation.h"
 #include "modularNeural.h"
 
 namespace stcontroller{
-    enum MOTIONSATGE{// motion stage
-        SELF_ORGANIZATION_STAGE =1,
-        PHASE_STABLE_STAGE =2
-    };
-
     struct ModularNeuroControllerConf{
         /*
          *This conf is for set or store the configariotn of the neural control modules.
@@ -43,9 +40,11 @@ namespace stcontroller{
         std::vector<parameter> stVrnKneeInput;
 
         //1.2) MI of CPG,beta of PCPG, two parameters and CPGSType and weather or not to set SP
-        parameter stCPGMi;
-        parameter stPCPGBeta;
         parameter stCPGSType;
+        parameter stCPGMi;
+        parameter stCPGPGain;
+        parameter stCPGPThreshold;
+        parameter stPCPGBeta;
         struct{
             parameter Type;
             bool State;    
@@ -100,7 +99,6 @@ namespace stcontroller{
             this->sensor_num =sensor_num;
             this->param_num =param_num;
             this->pose_num = pose_num;
-
             stJ1Input.resize(leg_num);
             stPsnInput.resize(leg_num);
             stVrnHipInput.resize(leg_num);
@@ -145,6 +143,8 @@ namespace stcontroller{
             }
 
             stCPGMi=0.0;//0.075;//CPG
+            stCPGPGain=0.03;//0.075;//CPG
+            stCPGPThreshold=0.2;//CPG
             stPCPGBeta=0.0;//PCPG
             stCPGSType=5.0;//get CPGSType
             stsetCPGS.Type=stCPGSType;// set CPGSType
@@ -201,7 +201,10 @@ namespace stcontroller{
         private:
             ModularNeural *mnc;
         private:
+            Matrix ANC_RP;// motion phase differences between legs's movement
+            Matrix ANC_RP_NC;// autonomous neural connection between CPGs
             CPGSTYPE CPGSType;//get CPGType from outside of controller
+            parameter ANCstability;//the stability of motion phase differences
 
         protected:
 
@@ -222,6 +225,8 @@ namespace stcontroller{
             std::vector<lowPass_filter *> filterVoltage;
             std::vector<lowPass_filter *> filterPose;
             std::vector<lowPass_filter *> filterGRF;
+            MovingAverage * movingFilterPitch;
+            MovingAverage * movingFilterRoll;
 
 
             // post processing value of sensor value
@@ -231,6 +236,10 @@ namespace stcontroller{
             std::vector<parameter > JointVoltage;
             std::vector<parameter > Pose;
             std::vector<parameter > GRForce;
+
+
+            // sensory feedback noises of GRFs
+            std::vector<parameter > ForceNoise;
     };
 
 }

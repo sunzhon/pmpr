@@ -39,10 +39,10 @@ SPCPG::~SPCPG(){
     delete ves;
 }
 
-void SPCPG::setInput(parameter grf, parameter np_grf, vector<parameter> ori, parameter gain, matrixD signals, CPGSTYPE CPGType, Matrix cmatrix){
+void SPCPG::setInput(parameter grf, parameter np_grf, vector<parameter> ori, parameter gain, parameter threshold, matrixD signals, CPGSTYPE CPGType, Matrix cmatrix){
     //1) sensory adaptation, agrf adaptive ground reaction force
     sf_gain=gain;
-    sf_np_grf=np_grf;
+    sf_np_grf=grf;
     
     //2) Adaptive neural communication
    if(CPGType==REFLEX)
@@ -56,7 +56,8 @@ void SPCPG::setInput(parameter grf, parameter np_grf, vector<parameter> ori, par
     ves_grf=grf;
 
     //4) phase reset
-    prs_np_grf=np_grf;
+    prs_grf=grf;
+    prs_threshold=threshold;
 
     //5) phase inhibition
     pib_grf=grf;
@@ -100,7 +101,7 @@ void SPCPG::updateActivities(){
     ves->setInput(ves_ori,ves_grf,a_t);
     ves->step();
     //-----phasse reset and phase inhibition----//
-    prs->setInput(a_t,prs_np_grf);
+    prs->setInput(a_t,prs_grf, prs_threshold);
     prs->step();
 
     pib->setInput(pib_grf);
@@ -108,7 +109,7 @@ void SPCPG::updateActivities(){
 
     // the sum of these terms
     for(unsigned int i=0;i<2;i++){
-        a_t1.at(i) = a_t.at(i) - 0.0*sf->getOutput(i) + aci->getOutput(i) - 0.0*ves->getOutput(i) + 0.0*prs->getOutput(i) + 0.0*pib->getOutput(i);
+        a_t1.at(i) = a_t.at(i) + aci->getOutput(i) - sf->getOutput(i) + prs->getOutput(i)  + 0.0*ves->getOutput(i)  + 0.0*pib->getOutput(i);
         setActivity(i, a_t1.at(i));
     }
 }
@@ -136,6 +137,7 @@ SF::SF(){
     o_t.resize(2);
     gamma = 0.0;
     grf = 0.0;
+    mg=2.5*10;// lilibot weight
 }
 
 void SF::setInput(parameter gamma,parameter grf,vectorD o_t){
@@ -145,14 +147,173 @@ void SF::setInput(parameter gamma,parameter grf,vectorD o_t){
 }
 
 void SF::step(){
-    output.at(0)= gamma*grf*cos(o_t.at(0));
-    output.at(1)= gamma*grf*sin(o_t.at(1));
+    output.at(0)= gamma*grf/mg*cos(o_t.at(0));
+    output.at(1)= gamma*grf/mg*sin(o_t.at(1));
 }
 
 parameter SF::getOutput(unsigned int index)const{
     assert(index<2);
     return output.at(index);
 }
+
+//--------------------PhaseReset class----------------//
+PhaseReset::PhaseReset(){
+    Diracs =0.0;
+    a_t.resize(2);
+    a_t_old.resize(2);
+    grf = 0.0;
+    grf_old = 0.0;
+    threshold = 0.2; // default value
+    mg=2.5*10;// robot weight
+    reset.resize(2);
+}
+void PhaseReset::setInput(vectorD a_t,parameter grf, parameter threshold){
+    assert(a_t.size()==2);
+    this->a_t =  a_t;
+    this->grf = grf;
+    this->threshold = threshold;
+}
+void PhaseReset::step(){
+    /* version I:
+     * This version can work like GRF modulation to produce a stable gaits, 
+     * but it is not the right phase reset. For the improved one, please see version II in nexts.
+
+    
+    if((grf > threshold)&&(grf_old <= threshold)){ // threshold = 0.2 is vital important, it casued the reset moments
+        Diracs =1.0;
+    }else{
+        Diracs =0.0;
+    }
+    reset.at(0) = ( 1.0 - a_t.at(0))*Diracs;
+    reset.at(1) = - a_t.at(1)*Diracs;
+    grf_old = grf;
+    */
+
+    /*Version II:
+     * The phase reset, it has seseral key points:
+     * 1) If the actual touch mement is ahead of the expected one, then reset the phase, let the CPG oscillation return move
+     * 2) Find the activity value when the direction swithing, just opposite the sign of the activity of O2.
+     * 3)O1 used to control hip joint, whiel knee joint was activated by O1 joint. 
+     * 4) The degree of the knee joint movement is decieded by GRF value.
+     
+    if((grf > 0.2)&&(grf_old <= 0.2)){// Indicate the actual touch moment
+        if(a_t.at(0)>a_t_old.at(0)){// if signal is still increase for hip2 joint forward movement.
+            Diracs =1.0;
+        }else{
+           Diracs =0.0;
+        }
+    }else{
+        Diracs =0.0;
+    }
+    reset.at(0) = (1-a_t.at(0))*Diracs;
+    reset.at(1) = - 1.0*a_t.at(1)*Diracs;// maybe use hieracy CPG phase process
+    grf_old = grf;
+
+    a_t_old.at(0)=a_t.at(0);
+    a_t_old.at(0)=a_t.at(0);
+    */
+
+    /* Version III
+     * Induce robot weight mg to normalize the PR parameter F_t threshold
+     *
+     * */
+    if((grf > threshold*mg/4.0)&&(grf_old <= threshold*mg/4.0)){ // threshold = 0.2 is vital important, it casued the reset moments
+        Diracs =1.0;
+    }else{
+        Diracs =0.0;
+    }
+    reset.at(0) = ( 1.0 - a_t.at(0))*Diracs;
+    reset.at(1) = - a_t.at(1)*Diracs;
+    grf_old = grf;
+
+
+}
+parameter PhaseReset::getOutput(unsigned int index)const{
+    assert(index < 2);
+    return reset.at(index);
+}
+
+//-----------PhaseInhibition class-----//
+PhaseInhibition::PhaseInhibition(){
+    Ch=0.06;
+    grf=0.0;
+    Tduration =0.0;
+    inhibition.resize(2);
+}
+void PhaseInhibition::setInput(parameter grf){
+    this->grf =grf;
+}
+void PhaseInhibition::step(){
+    if(grf >0.3)
+        Tduration = 1.0;
+    else{
+        Tduration = 0.0;
+    }
+    inhibition.at(0)=0.0;
+    inhibition.at(1)=-Ch*grf*Tduration;
+}
+
+parameter PhaseInhibition::getOutput(unsigned int index)const{
+    assert(index<2);
+    return inhibition.at(index);
+}
+
+//-------------------------vestibular response class ------//
+Vestibular::Vestibular(uint8_t leg){
+    assert(leg>=0);
+    ves.resize(2);
+    roll = 0.0;
+    pitch = 0.0;
+    grf = 0.0;
+    switch(leg){
+        case 0:
+        case 1:
+            roll_gain= 5;
+            break;
+        case 2:
+        case 3:
+            roll_gain= -5;
+            break;
+        default:
+            perror("leg number is wrong in vestibular response");
+    }
+
+    switch(leg){
+        case 0:
+        case 2:
+            pitch_gain= 5.8;
+            break;
+        case 1:
+        case 3:
+            pitch_gain= -5.8;
+            break;
+        default:
+            perror("leg number is wrong in vestibular response");
+    }
+
+}
+
+void Vestibular::setInput(vector<parameter> ori, parameter grf,vectorD a_t){
+    this->roll = ori.at(0);
+    this->pitch = ori.at(1);
+    this->grf = grf;
+    this->a_t = a_t;
+}
+
+void Vestibular::step(){
+    /*
+     * Through changing the pitch_gain from 5.0 to 6.0, the gaits changes from pace to gallop
+     *
+     * */
+    ves.at(0)= tanh(roll_gain*roll+ pitch_gain*pitch)*cos(a_t.at(0));
+    ves.at(1)= tanh(roll_gain*roll+ pitch_gain*pitch)*sin(a_t.at(1));
+}
+
+parameter Vestibular::getOutput(unsigned int index)const{
+    assert(index<2);
+    return ves.at(index);
+}
+
 
 //---------------------ACI Class------------------------//
 ACI::ACI(unsigned int ID,unsigned int nCPGs){
@@ -363,141 +524,4 @@ void ACI::setDelta(CPGSTYPE CPGSType, Matrix cmatrix){
             perror("CPGSType don't define in cpg.cpp:334");
     }
 
-}
-//--------------------PhaseReset class----------------//
-PhaseReset::PhaseReset(){
-    Diracs =0.0;
-    a_t.resize(2);
-    a_t_old.resize(2);
-    grf = 0.0;
-    grf_old = 0.0;
-    reset.resize(2);
-}
-void PhaseReset::setInput(vectorD a_t,parameter grf){
-    assert(a_t.size()==2);
-    this->a_t =  a_t;
-    this->grf = grf;
-}
-void PhaseReset::step(){
-    /* version I:
-     * This version can work like GRF modulation to produce a stable gaits, 
-     * but it is not the right phase reset. For the improved one, please see version II in nexts.
-     */
-
-    /*
-    if((grf > 0.2)&&(grf_old <= 0.2)){ //0.2 is vital important, it casued the reset moments
-        Diracs =1.0;
-    }else{
-        Diracs =0.0;
-    }
-    reset.at(0) = ( 1.0 - a_t.at(0))*Diracs;
-    reset.at(1) = - a_t.at(1)*Diracs;
-    grf_old = grf;
-    */
-
-    /*Version II:
-     * The phase reset, it has seseral key points:
-     * 1) If the actual touch mement is ahead of the expected one, then reset the phase, let the CPG oscillation return move
-     * 2) Find the activity value when the direction swithing, just opposite the sign of the activity of O2.
-     * 3)O1 used to control hip joint, whiel knee joint was activated by O1 joint. 
-     * 4) The degree of the knee joint movement is decieded by GRF value.
-     */
-    if((grf > 0.2)&&(grf_old <= 0.2)){// Indicate the actual touch moment
-        if(a_t.at(0)>a_t_old.at(0)){// if signal is still increase for hip2 joint forward movement.
-            Diracs =1.0;
-        }else{
-           Diracs =0.0;
-        }
-    }else{
-        Diracs =0.0;
-    }
-    reset.at(0) = (1-a_t.at(0))*Diracs;
-    reset.at(1) = - 1.0*a_t.at(1)*Diracs;// maybe use hieracy CPG phase process
-    grf_old = grf;
-
-    a_t_old.at(0)=a_t.at(0);
-    a_t_old.at(0)=a_t.at(0);
-
-}
-parameter PhaseReset::getOutput(unsigned int index)const{
-    assert(index < 2);
-    return reset.at(index);
-}
-
-//-----------PhaseInhibition class-----//
-PhaseInhibition::PhaseInhibition(){
-    Ch=0.06;
-    grf=0.0;
-    Tduration =0.0;
-    inhibition.resize(2);
-}
-void PhaseInhibition::setInput(parameter grf){
-    this->grf =grf;
-}
-void PhaseInhibition::step(){
-    if(grf >0.3)
-        Tduration = 1.0;
-    else{
-        Tduration = 0.0;
-    }
-    inhibition.at(0)=0.0;
-    inhibition.at(1)=-Ch*grf*Tduration;
-}
-
-parameter PhaseInhibition::getOutput(unsigned int index)const{
-    assert(index<2);
-    return inhibition.at(index);
-}
-
-//-------------------------vestibular response class ------//
-Vestibular::Vestibular(uint8_t leg){
-    assert(leg>=0);
-    ves.resize(2);
-    roll = 0.0;
-    pitch = 0.0;
-    grf = 0.0;
-    switch(leg){
-        case 0:
-        case 1:
-            roll_gain= 50;
-            break;
-        case 2:
-        case 3:
-            roll_gain= -50;
-            break;
-        default:
-            perror("leg number is wrong in vestibular response");
-    }
-
-    switch(leg){
-        case 0:
-        case 2:
-            pitch_gain= 50;
-            break;
-        case 1:
-        case 3:
-            pitch_gain= -50;
-            break;
-        default:
-            perror("leg number is wrong in vestibular response");
-    }
-
-}
-void Vestibular::setInput(vector<parameter> ori, parameter grf,vectorD a_t){
-    this->roll = ori.at(0);
-    this->pitch = ori.at(1);
-    this->grf = grf;
-    this->a_t = a_t;
-}
-void Vestibular::step(){
-    ves.at(0)= 0.2*tanh(roll_gain*roll+ pitch_gain*pitch)*cos(a_t.at(0));
-    ves.at(1)= 0.2*tanh(roll_gain*roll+ pitch_gain*pitch)*sin(a_t.at(1));
-    //ves.at(0)= (roll_gain*roll+ pitch_gain*pitch)*cos(a_t.at(0))*grf;
-    //ves.at(1)= (roll_gain*roll+ pitch_gain*pitch)*sin(a_t.at(1))*grf;
-    //ves.at(0)= (0.0*roll_gain*roll*(grf>0.01 ? 0.0:1.0 )+ 0.0*pitch_gain*pitch*(grf>0.02 ? 1.0:0.0 ))*cos(a_t.at(0));
-    //ves.at(1)= (0.0*roll_gain*roll*(grf>0.01 ? 0.0:1.0 )+ 0.0*pitch_gain*pitch*(grf>0.02 ? 1.0:0.0 ))*sin(a_t.at(1));
-}
-parameter Vestibular::getOutput(unsigned int index)const{
-    assert(index<2);
-    return ves.at(index);
 }

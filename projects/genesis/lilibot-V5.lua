@@ -68,59 +68,50 @@ function sliderChange(ui,id,newVal)
         simSetGraphUserData(graphHandleRF,"PSN11",data[6])
         simSetGraphUserData(graphHandleRF,"VRNHip",data[7])
         simSetGraphUserData(graphHandleRF,"VRNKnee",data[8])
-        simSetGraphUserData(graphHandleRF,"ReflexOut0",data[9])
-        simSetGraphUserData(graphHandleRF,"ReflexOut1",data[10])
-        simSetGraphUserData(graphHandleRF,"ReflexOut2",data[11])
-        simSetGraphUserData(graphHandleRF,"PMN0",data[12])
-        simSetGraphUserData(graphHandleRF,"PMN1",data[13])
-        simSetGraphUserData(graphHandleRF,"PMN2",data[14])
-        simSetGraphUserData(graphHandleRF,"GRF",data[85])
+        simSetGraphUserData(graphHandleRF,"PMN0",data[9])
+        simSetGraphUserData(graphHandleRF,"PMN1",data[10])
+        simSetGraphUserData(graphHandleRF,"PMN2",data[11])
+        simSetGraphUserData(graphHandleRF,"GRF",data[12])
 
 
-        simSetGraphUserData(graphHandleRH,"CPGN0",data[22])
-        simSetGraphUserData(graphHandleRH,"CPGN1",data[23])
-        simSetGraphUserData(graphHandleRH,"PCPGN0",data[24])
-        simSetGraphUserData(graphHandleRH,"PCPGN1",data[25])
-        simSetGraphUserData(graphHandleRH,"PSN10",data[26])
-        simSetGraphUserData(graphHandleRH,"PSN11",data[27])
-        simSetGraphUserData(graphHandleRH,"VRNHip",data[28])
-        simSetGraphUserData(graphHandleRH,"VRNKnee",data[29])
-        simSetGraphUserData(graphHandleRH,"ReflexOut0",data[30])
-        simSetGraphUserData(graphHandleRH,"ReflexOut1",data[31])
-        simSetGraphUserData(graphHandleRH,"ReflexOut2",data[32])
-        simSetGraphUserData(graphHandleRH,"PMN0",data[33])
-        simSetGraphUserData(graphHandleRH,"PMN1",data[34])
-        simSetGraphUserData(graphHandleRH,"PMN2",data[35])
-        simSetGraphUserData(graphHandleRH,"GRF",data[86])
+        simSetGraphUserData(graphHandleRH,"CPGN0",data[13])
+        simSetGraphUserData(graphHandleRH,"CPGN1",data[14])
+        simSetGraphUserData(graphHandleRH,"PCPGN0",data[15])
+        simSetGraphUserData(graphHandleRH,"PCPGN1",data[16])
+        simSetGraphUserData(graphHandleRH,"PSN10",data[17])
+        simSetGraphUserData(graphHandleRH,"PSN11",data[18])
+        simSetGraphUserData(graphHandleRH,"VRNHip",data[19])
+        simSetGraphUserData(graphHandleRH,"VRNKnee",data[20])
+        simSetGraphUserData(graphHandleRH,"PMN0",data[21])
+        simSetGraphUserData(graphHandleRH,"PMN1",data[22])
+        simSetGraphUserData(graphHandleRH,"PMN2",data[23])
+        simSetGraphUserData(graphHandleRH,"GRF",data[24])
 
-        simSetGraphUserData(graphHandleLF,"CPGN0",data[43])
-        simSetGraphUserData(graphHandleLF,"CPGN1",data[44])
-        simSetGraphUserData(graphHandleLF,"PCPGN0",data[45])
-        simSetGraphUserData(graphHandleLF,"PCPGN1",data[46])
-        simSetGraphUserData(graphHandleLF,"PSN10",data[47])
-        simSetGraphUserData(graphHandleLF,"PSN11",data[48])
-        simSetGraphUserData(graphHandleLF,"VRNHip",data[49])
-        simSetGraphUserData(graphHandleLF,"VRNKnee",data[50])
-        simSetGraphUserData(graphHandleLF,"ReflexOut0",data[51])
-        simSetGraphUserData(graphHandleLF,"ReflexOut1",data[52])
-        simSetGraphUserData(graphHandleLF,"ReflexOut2",data[53])
-        simSetGraphUserData(graphHandleLF,"PMN0",data[54])
-        simSetGraphUserData(graphHandleLF,"PMN1",data[55])
-        simSetGraphUserData(graphHandleLF,"PMN2",data[56])
-        simSetGraphUserData(graphHandleLF,"GRF",data[87])
+        simSetGraphUserData(graphHandleLF,"CPGN0",data[25])
+        simSetGraphUserData(graphHandleLF,"CPGN1",data[26])
+        simSetGraphUserData(graphHandleLF,"PCPGN0",data[27])
+        simSetGraphUserData(graphHandleLF,"PCPGN1",data[28])
+        simSetGraphUserData(graphHandleLF,"PSN10",data[29])
+        simSetGraphUserData(graphHandleLF,"PSN11",data[30])
+        simSetGraphUserData(graphHandleLF,"VRNHip",data[31])
+        simSetGraphUserData(graphHandleLF,"VRNKnee",data[32])
+        simSetGraphUserData(graphHandleLF,"PMN0",data[33])
+        simSetGraphUserData(graphHandleLF,"PMN1",data[34])
+        simSetGraphUserData(graphHandleLF,"PMN2",data[35])
+        simSetGraphUserData(graphHandleLF,"GRF",data[36])
 
-        simSetGraphUserData(graphHandleLH,"CPGN0",data[64])
-        simSetGraphUserData(graphHandleLH,"CPGN1",data[65])
-        simSetGraphUserData(graphHandleLH,"PCPGN0",data[66])
-        simSetGraphUserData(graphHandleLH,"PCPGN1",data[67])
-        simSetGraphUserData(graphHandleLH,"PSN10",data[68])
-        simSetGraphUserData(graphHandleLH,"PSN11",data[69])
-        simSetGraphUserData(graphHandleLH,"VRNHip",data[70])
-        simSetGraphUserData(graphHandleLH,"VRNKnee",data[71])
-        simSetGraphUserData(graphHandleLH,"ReflexOut0",data[72])
-        simSetGraphUserData(graphHandleLH,"ReflexOut1",data[73])
-        simSetGraphUserData(graphHandleLH,"ReflexOut2",data[74])
-        simSetGraphUserData(graphHandleLH,"GRF",data[88])
+        simSetGraphUserData(graphHandleLH,"CPGN0",data[37])
+        simSetGraphUserData(graphHandleLH,"CPGN1",data[38])
+        simSetGraphUserData(graphHandleLH,"PCPGN0",data[39])
+        simSetGraphUserData(graphHandleLH,"PCPGN1",data[40])
+        simSetGraphUserData(graphHandleLH,"PSN10",data[41])
+        simSetGraphUserData(graphHandleLH,"PSN11",data[42])
+        simSetGraphUserData(graphHandleLH,"VRNHip",data[43])
+        simSetGraphUserData(graphHandleLH,"VRNKnee",data[44])
+        --simSetGraphUserData(graphHandleLH,"PMN0",data[45])
+        --simSetGraphUserData(graphHandleLH,"PMN1",data[46])
+        --simSetGraphUserData(graphHandleLH,"PMN2",data[47])
+        simSetGraphUserData(graphHandleLH,"GRF",data[48])
 
     end
 
@@ -265,19 +256,23 @@ function sliderChange(ui,id,newVal)
         graphHandleLF=sim.getObjectHandle("InspectableLF")
         graphHandleLH=sim.getObjectHandle("InspectableLH")
         -- Check if the required ROS plugin is loaded
-        moduleName=0
-        moduleVersion=0
-        index=0
-        pluginNotFound=true
-        while moduleName do
-            moduleName,moduleVersion=sim.getModuleName(index)
-            if (moduleName=='RosInterface') then
-                pluginNotFound=false
+        if simROS then
+            moduleName=0
+            moduleVersion=0
+            index=0
+            pluginNotFound=true
+            print(moduleName)
+            while true do
+                moduleName,moduleVersion=sim.getModuleName(index)
+                if (moduleName=='ROSInterface') then
+                    pluginNotFound=false
+                    break
+                end
+                index=index+1
             end
-            index=index+1
-        end
-        if (pluginNotFound) then
-            sim.displayDialog('Error','The RosInterface was not found.',sim.dlgstyle_ok,false,nil,{0.8,0,0,0,0,0},{0.5,0,0,1,1,1})
+            if (pluginNotFound) then
+                sim.displayDialog('Error','The RosInterface was not found.',sim.dlgstyle_ok,false,nil,{0.8,0,0,0,0,0},{0.5,0,0,1,1,1})
+            end
         end
 
         -- If found then start the subscribers and publishers
@@ -307,7 +302,8 @@ function sliderChange(ui,id,newVal)
             sensorValuePub=simROS.advertise('/'..sensorValueName,'std_msgs/Float32MultiArray')
             simulationTimePub=simROS.advertise('/'..simulationTimeName,'rosgraph_msgs/Clock')
             -- Start rosnode
-            result=sim.launchExecutable(simGetStringParameter(sim_stringparam_scene_path) .. '/../../projects/genesis/catkin_ws/src/stbot_dfrl/launch/start_lilibot_vrep',0)
+            result=sim.launchExecutable(simGetStringParameter(sim_stringparam_scene_path) .. '/../../projects/genesis/catkin_ws/src/stbot_pmpr/launch/start_lilibot_vrep',0)
+            print(result)
             if (result==false) then
                 sim.displayDialog('Error','External controler ROS-Node not found',sim.dlgstyle_ok,false,nil,{0.8,0,0,0,0,0},{0.5,0,0,1,1,1})
             end
@@ -394,7 +390,7 @@ function sliderChange(ui,id,newVal)
                 then
                     force={0.0,0.0,0.0}
                 end
-                sensor_array[i + 4*#joint_array + #body_eularAngles + #body_position + #body_velocity] = math.sqrt(force[1]^2+force[2]^2+force[3]^2)/10.0 --+ ((force[3]/10.0 > 0.1) and 0.5*math.random() or 0.0) --let the value into [0,1] --force[3]/10.0 
+                sensor_array[i + 4*#joint_array + #body_eularAngles + #body_position + #body_velocity] = math.sqrt(force[1]^2+force[2]^2+force[3]^2) --+ ((force[3]/10.0 > 0.1) and 0.5*math.random() or 0.0) --let the value into [0,1] --force[3]/10.0 
 
             end
             -- please don't change this value,

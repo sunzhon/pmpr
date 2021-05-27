@@ -1,0 +1,13 @@
+#!/bin/bash
+
+
+current_path=$(cd `dirname $0`;pwd)
+link_node="/link_node_file.sh"
+# initial the rospack path
+package_env="/../../../devel/setup.sh"
+echo ${current_path}${package_env}
+source ${current_path}${package_env}
+# build a link of the node
+. ${current_path}${link_node}
+
+roslaunch stbot_pmpr stbot_pmpr.launch

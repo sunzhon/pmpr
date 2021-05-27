@@ -10,7 +10,7 @@
 class NP:public ANN {
 public:
 
-	NP(std::string _transfer= "logistic",bool learning=false);
+	NP(float scale=1.0, std::string _transfer= "logistic",bool learning=false);
 	double getOutput();
 	double getWr();
 	void step();
@@ -19,6 +19,7 @@ public:
 	void startLearning();
 	void setUp(double _Wi,double _Wr,double _Bias);
 private:
+    float scale;
 	unsigned int count;
 	double nu,delta, deltaWi,deltaWr,deltaB;
 	double Wi,Wr,Bias;
